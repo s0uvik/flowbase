@@ -24,7 +24,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-// import {auth-client} from "@/lib/auth-client";
+import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
 const signupFormSchema = z
@@ -49,8 +49,23 @@ export function SignupForm() {
       password: "",
     },
   });
-  const onSubmit = (data: SignupFormValues) => {
-    console.log(data);
+  const onSubmit = async (data: SignupFormValues) => {
+    await authClient.signUp.email(
+      {
+        name: data.email,
+        email: data.email,
+        password: data.password,
+        callbackURL: "/",
+      },
+      {
+        onSuccess: () => {
+          router.push("/");
+        },
+        onError: (error) => {
+          toast.error(error.error.message);
+        },
+      }
+    );
   };
 
   const isPending = form.formState.isSubmitting;
