@@ -1,9 +1,12 @@
-import prisma from "@/lib/db";
+import { requireAuth } from "@/lib/auth-utils";
+import { caller } from "@/trpc/server";
 import React from "react";
 
 const page = async () => {
-  const user = await prisma.user.findMany();
-  return <div>{JSON.stringify(user)}</div>;
+  await requireAuth();
+
+  const data = await caller.getUsers();
+  return <div>{JSON.stringify(data)}</div>;
 };
 
 export default page;
