@@ -71,8 +71,8 @@ export function SignupForm() {
   const isPending = form.formState.isSubmitting;
 
   return (
-    <div className="p-4 flex justify-center items-center h-screen border">
-      <Card className="w-full max-w-md">
+    <div>
+      <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Welcome to Flowbase</CardTitle>
           <CardDescription>Create your account to get started</CardDescription>
@@ -88,6 +88,13 @@ export function SignupForm() {
                     type="button"
                     disabled={isPending}
                   >
+                    <Image
+                      src="/icons/google.svg"
+                      alt="Google"
+                      width={20}
+                      height={20}
+                      className="mr-2"
+                    />
                     Sign up with Google
                   </Button>
                   <Button
@@ -96,6 +103,13 @@ export function SignupForm() {
                     type="button"
                     disabled={isPending}
                   >
+                    <Image
+                      src="/icons/github.svg"
+                      alt="Github"
+                      width={20}
+                      height={20}
+                      className="mr-2"
+                    />
                     Sign up with Github
                   </Button>
                 </div>

@@ -64,8 +64,8 @@ export function LoginForm() {
   const isPending = form.formState.isSubmitting;
 
   return (
-    <div className="p-4 flex justify-center items-center h-screen border">
-      <Card className="w-full md:w-1/3 max-w-xl">
+    <div>
+      <Card className="w-full">
         <CardHeader>
           <CardTitle className="text-2xl">Welcome back to Flowbase</CardTitle>
           <CardDescription>Enter your credentials to sign in</CardDescription>
@@ -81,6 +81,13 @@ export function LoginForm() {
                     type="button"
                     disabled={isPending}
                   >
+                    <Image
+                      src="/icons/google.svg"
+                      alt="Google"
+                      width={20}
+                      height={20}
+                      className="mr-2"
+                    />
                     Sign in with Google
                   </Button>
                   <Button
@@ -89,6 +96,13 @@ export function LoginForm() {
                     type="button"
                     disabled={isPending}
                   >
+                    <Image
+                      src="/icons/github.svg"
+                      alt="Github"
+                      width={20}
+                      height={20}
+                      className="mr-2"
+                    />
                     Sign in with Github
                   </Button>
                 </div>
