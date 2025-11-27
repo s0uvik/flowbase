@@ -64,7 +64,7 @@ export function SignupForm() {
         onError: (error) => {
           toast.error(error.error.message);
         },
-      }
+      },
     );
   };
 

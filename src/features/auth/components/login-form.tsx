@@ -57,7 +57,7 @@ export function LoginForm() {
         onError: (error) => {
           toast.error(error.error.message);
         },
-      }
+      },
     );
   };
 
