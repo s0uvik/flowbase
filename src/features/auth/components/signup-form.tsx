@@ -74,7 +74,12 @@ export function SignupForm() {
     <div>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Welcome to Flowbase</CardTitle>
+          <CardTitle className="text-2xl">
+            Welcome to{" "}
+            <span className=" text-primary font-semibold font-mono">
+              Flowbase
+            </span>
+          </CardTitle>
           <CardDescription>Create your account to get started</CardDescription>
         </CardHeader>
         <CardContent>

@@ -67,7 +67,12 @@ export function LoginForm() {
     <div>
       <Card className="w-full">
         <CardHeader>
-          <CardTitle className="text-2xl">Welcome back to Flowbase</CardTitle>
+          <CardTitle className="text-2xl">
+            Welcome back to{" "}
+            <span className=" text-primary font-semibold font-mono">
+              Flowbase
+            </span>
+          </CardTitle>
           <CardDescription>Enter your credentials to sign in</CardDescription>
         </CardHeader>
         <CardContent>
