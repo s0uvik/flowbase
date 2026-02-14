@@ -1,12 +1,26 @@
+"use client";
+import { Button } from "@/components/ui/button";
 import { requireAuth } from "@/lib/auth-utils";
-import { caller } from "@/trpc/server";
+import { useTRPC } from "@/trpc/client";
+import { caller, trpc } from "@/trpc/server";
+import { useMutation } from "@tanstack/react-query";
 import React from "react";
 
-const page = async () => {
-  await requireAuth();
+const page = () => {
+  // await requireAuth();
 
-  const data = await caller.getUsers();
-  return <div>{JSON.stringify(data)}</div>;
+  const trpc = useTRPC();
+
+  // const data = await caller.getUsers();
+  const testAI = useMutation(trpc.testAI.mutationOptions());
+  return (
+    <div>
+      {/* {JSON.stringify(data)} */}
+      <Button disabled={testAI.isPending} onClick={() => testAI.mutate()}>
+        Test AI
+      </Button>
+    </div>
+  );
 };
 
 export default page;
