@@ -5,6 +5,7 @@ import { useTRPC } from "@/trpc/client";
 import { caller, trpc } from "@/trpc/server";
 import { useMutation } from "@tanstack/react-query";
 import React from "react";
+import { toast } from "sonner";
 
 const page = () => {
   // await requireAuth();
@@ -12,7 +13,16 @@ const page = () => {
   const trpc = useTRPC();
 
   // const data = await caller.getUsers();
-  const testAI = useMutation(trpc.testAI.mutationOptions());
+  const testAI = useMutation(
+    trpc.testAI.mutationOptions({
+      onSuccess: () => {
+        toast.success("Success");
+      },
+      onError: () => {
+        toast.error("Error");
+      },
+    }),
+  );
   return (
     <div>
       {/* {JSON.stringify(data)} */}

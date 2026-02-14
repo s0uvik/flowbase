@@ -5,9 +5,14 @@ import prisma from "@/lib/db";
 import { google } from "@ai-sdk/google";
 import { generateText } from "ai";
 import { inngest } from "@/inngest/client";
+import { TRPCError } from "@trpc/server";
 
 export const appRouter = createTRPCRouter({
   testAI: protectedProcedure.mutation(async () => {
+    // throw new TRPCError({
+    //   code: "INTERNAL_SERVER_ERROR",
+    //   message: "Something went wrong",
+    // });
     await inngest.send({ name: "execute/ai" });
     return { success: true, message: "Job queued successfully" };
   }),
