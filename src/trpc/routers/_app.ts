@@ -1,28 +1,9 @@
-import { z } from "zod";
-import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
-import prisma from "@/lib/db";
-
-import { google } from "@ai-sdk/google";
-import { generateText } from "ai";
-import { inngest } from "@/inngest/client";
-import { TRPCError } from "@trpc/server";
+import { createTRPCRouter } from "../init";
+import { workflowRouter } from "@/features/workflows/server/router";
 
 export const appRouter = createTRPCRouter({
-  testAI: protectedProcedure.mutation(async () => {
-    // throw new TRPCError({
-    //   code: "INTERNAL_SERVER_ERROR",
-    //   message: "Something went wrong",
-    // });
-    await inngest.send({ name: "execute/ai" });
-    return { success: true, message: "Job queued successfully" };
-  }),
-  getUsers: protectedProcedure.query(({ ctx }) => {
-    return prisma.user.findMany({
-      where: {
-        id: ctx.auth.user.id,
-      },
-    });
-  }),
+  workflows: workflowRouter,
 });
+
 // export type definition of API
 export type AppRouter = typeof appRouter;
