@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Item } from "@radix-ui/react-accordion";
 import { authClient } from "@/lib/auth-client";
-
+import { useHasActiveSubscription } from "@/features/subscriptions/hooks/use-subscriptions";
 const menuItems = [
   {
     title: "Workflows",
@@ -53,6 +53,7 @@ const menuItems = [
 const AppSidebar = () => {
   const router = useRouter();
   const pathname = usePathname();
+  const { hasActiveSubscription, isLoading } = useHasActiveSubscription();
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
@@ -95,28 +96,30 @@ const AppSidebar = () => {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              tooltip="Upgrade to Pro"
-              asChild
-              className="gap-x-4 h-10 px-4"
-            >
-              <Link href="/#" prefetch>
+          {!hasActiveSubscription && !isLoading && (
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                tooltip="Upgrade to Pro"
+                className="gap-x-4 h-10 px-4"
+                onClick={() => {
+                  authClient.checkout({
+                    slug: "pro",
+                  });
+                }}
+              >
                 <StarIcon className=" size-4" />
                 <span>Upgrade to Pro</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
           <SidebarMenuItem>
             <SidebarMenuButton
               tooltip="Biling Portal"
-              asChild
               className="gap-x-4 h-10 px-4"
+              onClick={() => authClient.customer.portal()}
             >
-              <Link href="/#" prefetch>
-                <CreditCardIcon className=" size-4" />
-                <span>Billing Portal</span>
-              </Link>
+              <CreditCardIcon className=" size-4" />
+              <span>Billing Portal</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
