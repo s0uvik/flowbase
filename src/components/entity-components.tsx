@@ -1,6 +1,7 @@
-import { PlusIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, PlusIcon, SearchIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import Link from "next/link";
+import { Input } from "./ui/input";
 
 type EntityHeaderProps = {
   title: string;
@@ -74,6 +75,73 @@ gap-y-8 h-fuly"
           {children}
         </div>
         {pagination}
+      </div>
+    </div>
+  );
+};
+
+type EntitySearchProps = {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  disabled?: boolean;
+};
+
+export const EntitySearch = ({
+  value,
+  onChange,
+  placeholder = "Search",
+  disabled,
+}: EntitySearchProps) => {
+  return (
+    <div className="relative ml-auto">
+      <SearchIcon className="absolute left-2 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+      <Input
+        className=" max-w-[200px] bg-background shadow-none border-border pl-8"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        disabled={disabled}
+      />
+    </div>
+  );
+};
+
+type EntityPaginationProps = {
+  page: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  disabled?: boolean;
+};
+
+export const EntityPagination = ({
+  page,
+  totalPages,
+  onPageChange,
+  disabled,
+}: EntityPaginationProps) => {
+  return (
+    <div className="flex flex-row items-center justify-between gap-x-4">
+      <div className="flex flex-col">
+        <p>
+          Page {page} of {totalPages}
+        </p>
+      </div>
+      <div className="flex flex-row items-center gap-x-4">
+        <Button
+          disabled={page === 1 || disabled}
+          onClick={() => onPageChange(Math.max(page - 1, 1))}
+          size="sm"
+        >
+          <ChevronLeft className="size-4" />
+        </Button>
+        <Button
+          disabled={page === totalPages || totalPages === 0 || disabled}
+          onClick={() => onPageChange(Math.min(page + 1, totalPages))}
+          size="sm"
+        >
+          <ChevronRight className="size-4" />
+        </Button>
       </div>
     </div>
   );
