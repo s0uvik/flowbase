@@ -23,7 +23,7 @@ const page = async ({ params }: Props) => {
       <ErrorBoundary fallback={<EditorError />}>
         <Suspense fallback={<EditorLoading />}>
           <EditorHeader workflowId={workflowId} />
-          <main className=" fex-1">
+          <main className=" fex-1 border h-screen">
             <Editor workflowId={workflowId} />
           </main>
         </Suspense>
