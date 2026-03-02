@@ -1,19 +1,23 @@
 "use client";
 
 import { PlusIcon } from "lucide-react";
-import { memo } from "react";
+import { memo, useState } from "react";
 import { Button } from "./ui/button";
+import { NodeSelector } from "./node-selector";
 
 export const AddNodeButton = memo(() => {
+  const [openSelector, setOpenSelector] = useState(false);
   return (
-    <Button
-      onClick={() => {}}
-      size="icon"
-      variant="outline"
-      className=" bg-background"
-    >
-      <PlusIcon className=" size-4" />
-    </Button>
+    <NodeSelector open={openSelector} onOpenChange={setOpenSelector}>
+      <Button
+        onClick={() => {}}
+        size="icon"
+        variant="outline"
+        className=" bg-background"
+      >
+        <PlusIcon className=" size-4" />
+      </Button>
+    </NodeSelector>
   );
 });
 
