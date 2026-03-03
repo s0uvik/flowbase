@@ -7,6 +7,7 @@ import { BaseExecutionNode } from "../base-execution-node";
 import { HTTPRequestDialog, HTTPRequestFormType } from "./dialog";
 
 type HttpRequestNodeData = {
+  variableName?: string;
   endpoint?: string;
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: string;
@@ -17,7 +18,7 @@ type HttpRequestNodeType = Node<HttpRequestNodeData>;
 export const HttpRequestNode = memo((props: NodeProps<HttpRequestNodeType>) => {
   const nodeData = props.data;
   const description = nodeData?.endpoint
-    ? `${nodeData.method || "GET"}: ${nodeData.endpoint}`
+    ? `${nodeData.method || "GET"}: ${nodeData.endpoint} -> ${nodeData.variableName}`
     : "Not configured";
 
   const nodeStatus = "error";
