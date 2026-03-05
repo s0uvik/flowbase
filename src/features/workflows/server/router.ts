@@ -9,7 +9,7 @@ import { generateSlug } from "random-word-slugs";
 import z from "zod";
 import { NodeType } from "@prisma/client";
 import { Edge, Node } from "@xyflow/react";
-import { inngest } from "@/inngest/client";
+import { sendWorkflowExecution } from "@/inngest/utils";
 
 export const workflowRouter = createTRPCRouter({
   execute: protectedProcedure
@@ -22,10 +22,7 @@ export const workflowRouter = createTRPCRouter({
         },
       });
 
-      await inngest.send({
-        name: "workflow/execute.workflow",
-        data: { workflowId: input.id },
-      });
+      await sendWorkflowExecution({ workflowId: input.id });
 
       return workflow;
     }),
