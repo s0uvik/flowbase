@@ -56,6 +56,12 @@ const executorNodes: NodeTypeOption[] = [
     description: "Run a Gemini model",
     icon: "/icons/gemini.svg",
   },
+  {
+    type: NodeType.OPENAI,
+    label: "OpenAI",
+    description: "When a OpenAI event is captured",
+    icon: "/icons/openai.svg",
+  },
 ];
 
 type NodeSelectorProps = {
