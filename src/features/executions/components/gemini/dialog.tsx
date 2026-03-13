@@ -32,6 +32,17 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 
+const AVAILABLE_MODELS = [
+  "gemini-2.5-flash",
+  "gemini-2.5-pro",
+  "gemini-2.0-flash",
+  "gemini-2.0-flash-lite",
+  "gemini-1.5-flash",
+  "gemini-1.5-flash-8b",
+  "gemini-1.5-pro",
+  "gemini-1.0-pro",
+] as const;
+
 const formSchema = z.object({
   variableName: z
     .string()
@@ -40,33 +51,33 @@ const formSchema = z.object({
       message:
         "Variable name must start with a letter or underscore and container only letters, numbers, and underscores",
     }),
-  endpoint: z.string().min(1, { message: "Endpoint is required" }),
-  method: z.enum(["GET", "POST", "PUT", "PATCH", "DELETE"]),
-  body: z.string().optional(),
+  model: z.enum(AVAILABLE_MODELS),
+  systemPrompt: z.string().optional(),
+  userPrompt: z.string().min(1, { message: "Prompt is required" }),
 });
 
-export type HTTPRequestFormType = z.infer<typeof formSchema>;
+export type GeminiFormType = z.infer<typeof formSchema>;
 
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (values: HTTPRequestFormType) => void;
-  defaultValues?: Partial<HTTPRequestFormType>;
+  onSubmit: (values: GeminiFormType) => void;
+  defaultValues?: Partial<GeminiFormType>;
 };
 
-export const HTTPRequestDialog = ({
+export const GeminiDialog = ({
   open,
   onOpenChange,
   onSubmit,
   defaultValues,
 }: Props) => {
-  const form = useForm<HTTPRequestFormType>({
+  const form = useForm<GeminiFormType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       variableName: defaultValues?.variableName || "",
-      endpoint: defaultValues?.endpoint || "",
-      method: defaultValues?.method || "GET",
-      body: defaultValues?.body || "",
+      model: defaultValues?.model || AVAILABLE_MODELS[0],
+      systemPrompt: defaultValues?.systemPrompt || "",
+      userPrompt: defaultValues?.userPrompt || "",
     },
   });
 
@@ -75,18 +86,16 @@ export const HTTPRequestDialog = ({
     if (open) {
       form.reset({
         variableName: defaultValues?.variableName || "",
-        endpoint: defaultValues?.endpoint || "",
-        method: defaultValues?.method || "GET",
-        body: defaultValues?.body || "",
+        model: defaultValues?.model || AVAILABLE_MODELS[0],
+        systemPrompt: defaultValues?.systemPrompt || "",
+        userPrompt: defaultValues?.userPrompt || "",
       });
     }
   }, [open, defaultValues, form]);
 
   const watchVariableName = form.watch("variableName") || "result";
-  const watchMethod = form.watch("method");
-  const showBodyMethod = ["POST", "PUT", "PATCH"].includes(watchMethod);
 
-  const handleSubmit = (values: HTTPRequestFormType) => {
+  const handleSubmit = (values: GeminiFormType) => {
     onSubmit(values);
     onOpenChange(false);
   };
@@ -95,9 +104,9 @@ export const HTTPRequestDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className=" max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>HTTP Request</DialogTitle>
+          <DialogTitle>Gemini</DialogTitle>
           <DialogDescription>
-            Configure settings for the HTTP Request node.
+            Configure settings for the Gemini node.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -116,7 +125,7 @@ export const HTTPRequestDialog = ({
                   </FormControl>
                   <FormDescription>
                     Use this name to reference the result in other nodes:{" "}
-                    {"{{" + watchVariableName + ".httpResponse.data}}"}
+                    {"{{" + watchVariableName + ".text}}"}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -124,15 +133,29 @@ export const HTTPRequestDialog = ({
             />
             <FormField
               control={form.control}
-              name="endpoint"
+              name="model"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Endpoint</FormLabel>
+                  <FormLabel>Model</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://example.com" {...field} />
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a model" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {AVAILABLE_MODELS.map((model) => (
+                          <SelectItem key={model} value={model}>
+                            {model}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormDescription>
-                    The URL to send the HTTP request to.
+                    The model to use for the AI generation.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -140,55 +163,43 @@ export const HTTPRequestDialog = ({
             />
             <FormField
               control={form.control}
-              name="method"
+              name="systemPrompt"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Method</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a method" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="GET">GET</SelectItem>
-                      <SelectItem value="POST">POST</SelectItem>
-                      <SelectItem value="PUT">PUT</SelectItem>
-                      <SelectItem value="PATCH">PATCH</SelectItem>
-                      <SelectItem value="DELETE">DELETE</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <FormLabel>System Prompt (Optional)</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Optional system instructions to guide the model's behavior"
+                      {...field}
+                    />
+                  </FormControl>
                   <FormDescription>
-                    Static URL or use {"{{variables}}"} for simple values on{" "}
-                    {"{{json variable}}"} to stringify objects
+                    Give the model instructions on how it should behave.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            {showBodyMethod && (
-              <FormField
-                control={form.control}
-                name="body"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Body</FormLabel>
-                    <FormControl>
-                      <Textarea placeholder="" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      JSON with template variables. Use {"{{variables}}"}
-                      for simple values or {"{{json variable}}"} to stringify
-                      objects
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
+            <FormField
+              control={form.control}
+              name="userPrompt"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>User Prompt</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Enter your prompt here..."
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    The prompt for the model to process. Use {"{{variables}}"}{" "}
+                    for dynamic content.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <DialogFooter className="mt-4">
               <Button className=" w-full" type="submit">
                 Save

@@ -18,6 +18,10 @@ export const auth = betterAuth({
     enabled: true,
     autoSignIn: true,
   },
+  trustedOrigins: [
+    "https://geognostic-kylie-unpanoplied.ngrok-free.dev",
+    "http://localhost:3000",
+  ],
   plugins: [
     polar({
       client: polarClient,
