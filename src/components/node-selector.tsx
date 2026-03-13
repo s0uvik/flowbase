@@ -50,6 +50,12 @@ const executorNodes: NodeTypeOption[] = [
     description: "Make an HTTP request to an external API",
     icon: GlobeIcon,
   },
+  {
+    type: NodeType.GEMINI,
+    label: "Gemini",
+    description: "Run a Gemini model",
+    icon: "/icons/gemini.svg",
+  },
 ];
 
 type NodeSelectorProps = {
