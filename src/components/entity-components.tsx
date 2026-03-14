@@ -218,7 +218,7 @@ export const EmptyView = ({ message, onNew }: EmptyViewProps) => {
         <EmptyContent>
           <Button size="sm" onClick={onNew}>
             <PlusIcon className="size-4" />
-            New workflow
+            New
           </Button>
         </EmptyContent>
       )}
