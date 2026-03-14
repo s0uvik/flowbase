@@ -1,10 +1,37 @@
 import { requireAuth } from "@/lib/auth-utils";
-import React from "react";
+import { HydrateClient } from "@/trpc/server";
+import { SearchParams } from "nuqs";
+import React, { Suspense } from "react";
+import { ErrorBoundary } from "react-error-boundary";
+import { executionsParamsLoader } from "@/features/executions/server/params-loader";
+import { prefetchExecutions } from "@/features/executions/server/prefetch";
+import {
+  ExecutionsContainer,
+  ExecutionsErrorView,
+  ExecutionsList,
+  ExecutionsLoadingView,
+} from "@/features/executions/components/executions";
 
-const page = async () => {
+type Props = {
+  searchParams: Promise<SearchParams>;
+};
+
+const page = async ({ searchParams }: Props) => {
   await requireAuth();
+  const params = await executionsParamsLoader(searchParams);
+  prefetchExecutions(params);
 
-  return <div>executions</div>;
+  return (
+    <HydrateClient>
+      <ExecutionsContainer>
+        <ErrorBoundary fallback={<ExecutionsErrorView />}>
+          <Suspense fallback={<ExecutionsLoadingView />}>
+            <ExecutionsList />
+          </Suspense>
+        </ErrorBoundary>
+      </ExecutionsContainer>
+    </HydrateClient>
+  );
 };
 
 export default page;
