@@ -27,7 +27,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useCredentialByType } from "@/features/credentials/hooks/use-credentials";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { CredentialType } from "@prisma/client";
+import Image from "next/image";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
@@ -51,6 +54,7 @@ const formSchema = z.object({
       message:
         "Variable name must start with a letter or underscore and container only letters, numbers, and underscores",
     }),
+  credentialId: z.string().min(1, "Credential is required"),
   model: z.enum(AVAILABLE_MODELS),
   systemPrompt: z.string().optional(),
   userPrompt: z.string().min(1, { message: "Prompt is required" }),
@@ -71,10 +75,14 @@ export const GeminiDialog = ({
   onSubmit,
   defaultValues,
 }: Props) => {
+  const { data: credentials, isPending: isPendingCredentials } =
+    useCredentialByType(CredentialType.GEMINI);
+
   const form = useForm<GeminiFormType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       variableName: defaultValues?.variableName || "",
+      credentialId: defaultValues?.credentialId || "",
       model: defaultValues?.model || AVAILABLE_MODELS[0],
       systemPrompt: defaultValues?.systemPrompt || "",
       userPrompt: defaultValues?.userPrompt || "",
@@ -86,6 +94,7 @@ export const GeminiDialog = ({
     if (open) {
       form.reset({
         variableName: defaultValues?.variableName || "",
+        credentialId: defaultValues?.credentialId || "",
         model: defaultValues?.model || AVAILABLE_MODELS[0],
         systemPrompt: defaultValues?.systemPrompt || "",
         userPrompt: defaultValues?.userPrompt || "",
@@ -126,6 +135,61 @@ export const GeminiDialog = ({
                   <FormDescription>
                     Use this name to reference the result in other nodes:{" "}
                     {"{{" + watchVariableName + ".text}}"}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="credentialId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Credential</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={isPendingCredentials || !credentials?.length}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue
+                          placeholder={
+                            isPendingCredentials
+                              ? "Loading credentials..."
+                              : "Select a credential"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {credentials && credentials.length > 0 ? (
+                          credentials.map((credential) => (
+                            <SelectItem
+                              key={credential.id}
+                              value={credential.id}
+                            >
+                              <div className=" flex items-center gap-2">
+                                <Image
+                                  src="/icons/gemini.svg"
+                                  alt="Gemini"
+                                  width={16}
+                                  height={16}
+                                />
+
+                                {credential.name}
+                              </div>
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                            No Gemini credentials found
+                          </div>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormDescription>
+                    Select a Gemini API credential to use for this node.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

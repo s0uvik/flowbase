@@ -5,9 +5,11 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { generateText } from "ai";
 import { NonRetriableError } from "inngest";
 import { openaiChannel } from "@/inngest/channels/openai";
+import prisma from "@/lib/db";
 
 type OpenAIData = {
   variableName?: string;
+  credentialId?: string;
   model?: OpenAIFormType["model"];
   systemPrompt?: string;
   userPrompt?: string;
@@ -55,16 +57,35 @@ export const openAIExecutor: NodeExecutor<OpenAIData> = async ({
     throw new NonRetriableError("Openai node: User prompt is missing");
   }
 
+  if (!data.credentialId) {
+    await publish(
+      openaiChannel().status({
+        nodeId,
+        status: "error",
+      }),
+    );
+
+    throw new NonRetriableError("Openai node: Credential Id is missing");
+  }
+
+  const credential = await step.run("get-credential", () => {
+    return prisma.credential.findUnique({
+      where: {
+        id: data.credentialId,
+      },
+    });
+  });
+
+  if (!credential)
+    throw new NonRetriableError("Openai node: Credential not found");
+
   const systemPrompt = data.systemPrompt
     ? Handlebars.compile(data.systemPrompt)(context)
     : "You are a helpful assistant.";
   const userPrompt = Handlebars.compile(data.userPrompt)(context);
 
-  // TODO: Fetch credential that user selected
-
-  const API_KEY = process.env.OPENAI_API_KEY;
   const openai = createOpenAI({
-    apiKey: API_KEY,
+    apiKey: credential.value || "",
   });
   try {
     const { steps } = await step.ai.wrap("openai-generate-text", generateText, {
