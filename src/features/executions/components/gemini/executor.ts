@@ -6,6 +6,7 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateText } from "ai";
 import { NonRetriableError } from "inngest";
 import prisma from "@/lib/db";
+import { decrypt } from "@/lib/encryption";
 
 type GeminiData = {
   variableName?: string;
@@ -87,7 +88,7 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
   const userPrompt = Handlebars.compile(data.userPrompt)(context);
 
   const google = createGoogleGenerativeAI({
-    apiKey: credential.value || "",
+    apiKey: decrypt(credential.value || ""),
   });
   try {
     const { steps } = await step.ai.wrap("gemini-generate-text", generateText, {

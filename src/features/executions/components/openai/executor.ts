@@ -3,9 +3,10 @@ import Handlebars from "handlebars";
 import { OpenAIFormType } from "./dialog";
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateText } from "ai";
-import { NonRetriableError } from "inngest";
+import { NonRetriableError, openai } from "inngest";
 import { openaiChannel } from "@/inngest/channels/openai";
 import prisma from "@/lib/db";
+import { decrypt } from "@/lib/encryption";
 
 type OpenAIData = {
   variableName?: string;
@@ -87,7 +88,7 @@ export const openAIExecutor: NodeExecutor<OpenAIData> = async ({
   const userPrompt = Handlebars.compile(data.userPrompt)(context);
 
   const openai = createOpenAI({
-    apiKey: credential.value || "",
+    apiKey: decrypt(credential.value || ""),
   });
   try {
     const { steps } = await step.ai.wrap("openai-generate-text", generateText, {
