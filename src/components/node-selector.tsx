@@ -62,6 +62,18 @@ const executorNodes: NodeTypeOption[] = [
     description: "When a OpenAI event is captured",
     icon: "/icons/openai.svg",
   },
+  {
+    type: NodeType.DISCORD,
+    label: "Discord",
+    description: "Send a message to a Discord channel",
+    icon: "/icons/discord.svg",
+  },
+  {
+    type: NodeType.SLACK,
+    label: "Slack",
+    description: "Send a message to a Slack channel",
+    icon: "/icons/slack.svg",
+  },
 ];
 
 type NodeSelectorProps = {
