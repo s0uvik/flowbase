@@ -28,6 +28,7 @@ export const openAIExecutor: NodeExecutor<OpenAIData> = async ({
   context,
   step,
   publish,
+  userId,
 }) => {
   await publish(
     openaiChannel().status({
@@ -72,6 +73,7 @@ export const openAIExecutor: NodeExecutor<OpenAIData> = async ({
     return prisma.credential.findUnique({
       where: {
         id: data.credentialId,
+        userId,
       },
     });
   });
