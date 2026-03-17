@@ -3,14 +3,14 @@ import { inngest } from "./client";
 import prisma from "@/lib/db";
 import { topologicalSort } from "./utils";
 import { ExecutionStatus, NodeType } from "@prisma/client";
-import { getExecutor } from "@/features/executions/lib/executor-registry";
-import { httpRequestChannel } from "./channels/http-request";
-import { manualTriggerChannel } from "./channels/manual-trigger";
-import { googleFormTriggerChannel } from "./channels/google-form-trigger";
-import { stripeTriggerChannel } from "./channels/stripe-trigger";
-import { geminiChannel } from "./channels/gemini";
-import { openaiChannel } from "./channels/openai";
-import { slackChannel } from "./channels/slack";
+import { getExecutor } from "@/features/nodes/lib/executor-registry";
+import { httpRequestChannel } from "../features/nodes/executions-nodes/nodes/http-request/channel";
+import { manualTriggerChannel } from "../features/nodes/triggers-nodes/nodes/manual-trigger/channel";
+import { googleFormTriggerChannel } from "../features/nodes/triggers-nodes/nodes/google-form-trigger/channel";
+import { stripeTriggerChannel } from "../features/nodes/triggers-nodes/nodes/stripe-trigger/channel";
+import { geminiChannel } from "../features/nodes/executions-nodes/nodes/gemini/channel";
+import { openaiChannel } from "../features/nodes/executions-nodes/nodes/openai/channel";
+import { slackChannel } from "../features/nodes/executions-nodes/nodes/slack/channel";
 
 export const executeWorkflow = inngest.createFunction(
   {
