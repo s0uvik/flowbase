@@ -1,15 +1,13 @@
-import { PAGINATION } from "@/config/constant";
-import prisma from "@/lib/db";
-import {
-  protectedProcedure,
-  createTRPCRouter,
-  premiumProcedure,
-} from "@/trpc/init";
+import { NodeType } from "@prisma/client";
+import { TRPCError } from "@trpc/server";
+import type { Edge, Node } from "@xyflow/react";
 import { generateSlug } from "random-word-slugs";
 import z from "zod";
-import { NodeType } from "@prisma/client";
-import { Edge, Node } from "@xyflow/react";
+import { PAGINATION } from "@/config/constant";
 import { sendWorkflowExecution } from "@/inngest/utils";
+import prisma from "@/lib/db";
+import { polarClient } from "@/lib/polar";
+import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 
 export const workflowRouter = createTRPCRouter({
   execute: protectedProcedure
@@ -27,7 +25,27 @@ export const workflowRouter = createTRPCRouter({
       return workflow;
     }),
 
-  create: premiumProcedure.mutation(({ ctx }) => {
+  create: protectedProcedure.mutation(async ({ ctx }) => {
+    const customer = await polarClient.customers.getStateExternal({
+      externalId: ctx.auth.user.id,
+    });
+    const hasActiveSubscription = !!customer.activeSubscriptions?.length;
+
+    if (!hasActiveSubscription) {
+      const workflowCount = await prisma.workflow.count({
+        where: {
+          userId: ctx.auth.user.id,
+        },
+      });
+
+      if (workflowCount >= 1) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You need a premium subscription to access this feature",
+        });
+      }
+    }
+
     return prisma.workflow.create({
       data: {
         name: generateSlug(3),
