@@ -1,30 +1,18 @@
-import type { NodeExecutor } from "@/features/executions/types";
 import { NonRetriableError } from "inngest";
-import ky, { Options as KyOptions } from "ky";
-import Handlebars from "handlebars";
+import type { NodeExecutor } from "@/features/executions/types";
 import { httpRequestChannel } from "@/features/nodes/executions-nodes/nodes/http-request/channel";
+import {
+  executeHttpRequest,
+  HttpRequestExecutionError,
+} from "@/features/nodes/executions-nodes/nodes/http-request/request";
+import {
+  getDefaultHttpRequestConfig,
+  type StoredHttpRequestNodeData,
+} from "@/features/nodes/executions-nodes/nodes/http-request/types";
 
-type HttpRequestData = {
-  variableName?: string;
-  endpoint?: string;
-  method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-  body?: string;
-};
-
-Handlebars.registerHelper("json", (context) => {
-  const stringified = JSON.stringify(context, null, 2);
-  const safeString = new Handlebars.SafeString(stringified);
-
-  return safeString;
-});
-
-export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
-  data,
-  nodeId,
-  context,
-  step,
-  publish,
-}) => {
+export const httpRequestExecutor: NodeExecutor<
+  StoredHttpRequestNodeData
+> = async ({ data, nodeId, context, step, publish }) => {
   await publish(
     httpRequestChannel().status({
       nodeId,
@@ -32,72 +20,28 @@ export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
     }),
   );
 
+  const config = getDefaultHttpRequestConfig(data);
+
   try {
     const result = await step.run("http-request", async () => {
-      if (!data.endpoint) {
-        await publish(
-          httpRequestChannel().status({
-            nodeId,
-            status: "error",
-          }),
-        );
+      if (!config.url) {
+        throw new NonRetriableError("HTTP Request node: URL is missing.");
+      }
+
+      if (!config.outputVariableName) {
         throw new NonRetriableError(
-          "HTTP Request node: No endpoint configured",
+          "HTTP Request node: Output variable name is missing.",
         );
       }
-      if (!data.variableName) {
-        await publish(
-          httpRequestChannel().status({
-            nodeId,
-            status: "error",
-          }),
-        );
-        throw new NonRetriableError(
-          "HTTP Request node: No variable name configured",
-        );
-      }
-      if (!data.method) {
-        await publish(
-          httpRequestChannel().status({
-            nodeId,
-            status: "error",
-          }),
-        );
-        throw new NonRetriableError("HTTP Request node: No method configured");
-      }
 
-      const method = data.method;
-      const endpoint = Handlebars.compile(data.endpoint)(context);
-      console.log(endpoint);
-      const body = data.body;
-      const options: KyOptions = { method };
-
-      if (["POST", "PUT", "PATCH"].includes(method)) {
-        const resolve = Handlebars.compile(body || "{}")(context);
-        JSON.parse(resolve);
-        options.body = resolve;
-        options.headers = {
-          "Content-Type": "application/json",
-        };
-      }
-
-      const response = await ky(endpoint, options);
-      const contentType = response.headers.get("content-type");
-      const responseData = contentType?.includes("application/json")
-        ? await response.json()
-        : await response.text();
-
-      const responsePayload = {
-        httpResponse: {
-          status: response.status,
-          statusText: response.statusText,
-          body: responseData,
-        },
-      };
+      const response = await executeHttpRequest({
+        config,
+        context,
+      });
 
       return {
         ...context,
-        [data.variableName]: responsePayload,
+        [config.outputVariableName]: response,
       };
     });
 
@@ -116,6 +60,19 @@ export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
         status: "error",
       }),
     );
-    throw new NonRetriableError("HTTP Request node: Error executing request");
+
+    if (error instanceof NonRetriableError) {
+      throw error;
+    }
+
+    if (error instanceof HttpRequestExecutionError) {
+      throw new NonRetriableError(`HTTP Request node: ${error.message}`);
+    }
+
+    throw new NonRetriableError(
+      error instanceof Error
+        ? `HTTP Request node: ${error.message}`
+        : "HTTP Request node: Error executing request.",
+    );
   }
 };

@@ -1,27 +1,24 @@
 "use client";
 
-import { Node, NodeProps, useReactFlow } from "@xyflow/react";
+import { type Node, type NodeProps, useReactFlow } from "@xyflow/react";
 import { GlobeIcon } from "lucide-react";
 import { memo, useState } from "react";
-import { BaseExecutionNode } from "../../components/base-execution-node";
-import { HTTPRequestDialog, HTTPRequestFormType } from "./dialog";
-import { useNodeStatus } from "../../../hooks/use-node-status";
-import { fetchHttpRequestRealtimeToken } from "./actions";
 import { HTTP_REQUEST_CHANNEL_NAME } from "@/features/nodes/executions-nodes/nodes/http-request/channel";
+import { useNodeStatus } from "../../../hooks/use-node-status";
+import { BaseExecutionNode } from "../../components/base-execution-node";
+import { fetchHttpRequestRealtimeToken } from "./actions";
+import { HTTPRequestDialog, type HTTPRequestFormType } from "./dialog";
+import {
+  getDefaultHttpRequestConfig,
+  type StoredHttpRequestNodeData,
+} from "./types";
 
-type HttpRequestNodeData = {
-  variableName?: string;
-  endpoint?: string;
-  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-  body?: string;
-};
-
-type HttpRequestNodeType = Node<HttpRequestNodeData>;
+type HttpRequestNodeType = Node<StoredHttpRequestNodeData>;
 
 export const HttpRequestNode = memo((props: NodeProps<HttpRequestNodeType>) => {
-  const nodeData = props.data;
-  const description = nodeData?.endpoint
-    ? `${nodeData.method || "GET"}: ${nodeData.endpoint} -> ${nodeData.variableName}`
+  const nodeData = getDefaultHttpRequestConfig(props.data);
+  const description = nodeData.url
+    ? `${nodeData.method}: ${nodeData.url} -> ${nodeData.outputVariableName}`
     : "Not configured";
 
   const nodeStatus = useNodeStatus({
@@ -71,7 +68,7 @@ export const HttpRequestNode = memo((props: NodeProps<HttpRequestNodeType>) => {
         open={openSettingsDialog}
         onOpenChange={setOpenSettingsDialog}
         onSubmit={handleSubmit}
-        defaultValues={nodeData}
+        defaultValues={props.data}
       />
     </>
   );
