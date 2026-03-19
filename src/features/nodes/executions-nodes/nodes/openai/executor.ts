@@ -1,12 +1,12 @@
-import type { NodeExecutor } from "@/features/executions/types";
-import Handlebars from "handlebars";
-import { OpenAIFormType } from "./dialog";
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateText } from "ai";
-import { NonRetriableError, openai } from "inngest";
+import Handlebars from "handlebars";
+import { NonRetriableError } from "inngest";
+import type { NodeExecutor } from "@/features/executions/types";
 import { openaiChannel } from "@/features/nodes/executions-nodes/nodes/openai/channel";
 import prisma from "@/lib/db";
 import { decrypt } from "@/lib/encryption";
+import type { OpenAIFormType } from "./dialog";
 
 type OpenAIData = {
   variableName?: string;
@@ -115,6 +115,7 @@ export const openAIExecutor: NodeExecutor<OpenAIData> = async ({
     return {
       ...context,
       [data.variableName]: {
+        text,
         aiResponse: text,
       },
     };

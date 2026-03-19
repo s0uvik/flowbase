@@ -1,5 +1,11 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CredentialType } from "@prisma/client";
+import Image from "next/image";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import z from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -28,12 +34,6 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useCredentialByType } from "@/features/credentials/hooks/use-credentials";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { CredentialType } from "@prisma/client";
-import Image from "next/image";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import z from "zod";
 
 const AVAILABLE_MODELS = [
   "gpt-4o",
@@ -134,7 +134,7 @@ export const OpenAIDialog = ({
                   </FormControl>
                   <FormDescription>
                     Use this name to reference the result in other nodes:{" "}
-                    {"{{" + watchVariableName + ".text}}"}
+                    {`{{${watchVariableName}.text}}`}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -172,7 +172,7 @@ export const OpenAIDialog = ({
                               <div className=" flex items-center gap-2">
                                 <Image
                                   src="/icons/openai.svg"
-                                  alt="Gemini"
+                                  alt="OpenAI"
                                   width={16}
                                   height={16}
                                 />
@@ -183,14 +183,14 @@ export const OpenAIDialog = ({
                           ))
                         ) : (
                           <div className="px-2 py-1.5 text-sm text-muted-foreground">
-                            No Gemini credentials found
+                            No OpenAI credentials found
                           </div>
                         )}
                       </SelectContent>
                     </Select>
                   </FormControl>
                   <FormDescription>
-                    Select a Gemini API credential to use for this node.
+                    Select an OpenAI API credential to use for this node.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -259,8 +259,9 @@ export const OpenAIDialog = ({
                     />
                   </FormControl>
                   <FormDescription>
-                    The prompt for the model to process. Use {"{{variables}}"}{" "}
-                    for dynamic content.
+                    Use values from earlier nodes like{" "}
+                    {"{{previousResult.text}}"} or {"{{json apiResponse.data}}"}
+                    .
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

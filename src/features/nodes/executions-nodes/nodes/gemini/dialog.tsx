@@ -1,5 +1,11 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CredentialType } from "@prisma/client";
+import Image from "next/image";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import z from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -28,12 +34,6 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useCredentialByType } from "@/features/credentials/hooks/use-credentials";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { CredentialType } from "@prisma/client";
-import Image from "next/image";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import z from "zod";
 
 const AVAILABLE_MODELS = [
   "gemini-2.5-flash",
@@ -134,7 +134,7 @@ export const GeminiDialog = ({
                   </FormControl>
                   <FormDescription>
                     Use this name to reference the result in other nodes:{" "}
-                    {"{{" + watchVariableName + ".text}}"}
+                    {`{{${watchVariableName}.text}}`}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -257,8 +257,9 @@ export const GeminiDialog = ({
                     />
                   </FormControl>
                   <FormDescription>
-                    The prompt for the model to process. Use {"{{variables}}"}{" "}
-                    for dynamic content.
+                    Use values from earlier nodes like{" "}
+                    {"{{previousResult.text}}"} or {"{{json apiResponse.data}}"}
+                    .
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

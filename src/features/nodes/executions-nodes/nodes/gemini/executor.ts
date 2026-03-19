@@ -1,12 +1,12 @@
-import type { NodeExecutor } from "@/features/executions/types";
-import Handlebars from "handlebars";
-import { geminiChannel } from "@/features/nodes/executions-nodes/nodes/gemini/channel";
-import { GeminiFormType } from "./dialog";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateText } from "ai";
+import Handlebars from "handlebars";
 import { NonRetriableError } from "inngest";
+import type { NodeExecutor } from "@/features/executions/types";
+import { geminiChannel } from "@/features/nodes/executions-nodes/nodes/gemini/channel";
 import prisma from "@/lib/db";
 import { decrypt } from "@/lib/encryption";
+import type { GeminiFormType } from "./dialog";
 
 type GeminiData = {
   variableName?: string;
@@ -115,6 +115,7 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
     return {
       ...context,
       [data.variableName]: {
+        text,
         aiResponse: text,
       },
     };
