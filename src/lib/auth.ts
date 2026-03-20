@@ -10,6 +10,8 @@ import {
 import { polarClient } from "./polar";
 import prisma from "@/lib/db";
 
+const polarProductId = process.env.POLAR_PRODUCT_ID ?? "";
+
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
@@ -28,10 +30,7 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     },
   },
-  trustedOrigins: [
-    "https://geognostic-kylie-unpanoplied.ngrok-free.dev",
-    "http://localhost:3000",
-  ],
+  trustedOrigins: ["https://flowbase04.vercel.app", "http://localhost:3000"],
   plugins: [
     polar({
       client: polarClient,
@@ -40,7 +39,7 @@ export const auth = betterAuth({
         checkout({
           products: [
             {
-              productId: "6ae6ac20-bdc4-4792-9c8c-e64475606ae7",
+              productId: polarProductId,
               slug: "pro",
             },
           ],
