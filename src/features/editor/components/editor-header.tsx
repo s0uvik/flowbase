@@ -1,30 +1,28 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
 import { SaveIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import Link from "next/link";
+import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   useSuspenseWorkflow,
   useUpdateWorkflow,
   useUpdateWorkflowName,
 } from "@/features/workflows/hooks/use-workflows";
-import { Input } from "@/components/ui/input";
-import { useAtomValue } from "jotai";
-import { editorAtom } from "../store/atoms";
+import { useEditorStore } from "../store/atoms";
 
 type Props = { workflowId: string };
 
 export const EditroSaveButton = ({ workflowId }: Props) => {
-  const editor = useAtomValue(editorAtom);
+  const editor = useEditorStore((state) => state.editor);
   const saveWorkflow = useUpdateWorkflow();
 
   const handleSave = () => {
@@ -74,14 +72,14 @@ export const EditorNameInput = ({ workflowId }: Props) => {
 
     try {
       await updateWorkflow.mutateAsync({ id: workflowId, name });
-    } catch (error) {
+    } catch {
       setName(workflow.name);
     } finally {
       setIsEditing(false);
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleSave();
     } else if (e.key === "Escape") {
