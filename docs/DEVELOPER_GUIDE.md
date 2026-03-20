@@ -58,12 +58,14 @@ Defined in `.env.sample`:
 - `GOOGLE_GENERATIVE_AI_API_KEY`
 - `SENTRY_AUTH_TOKEN`
 - `POLAR_ACCESS_TOKEN`
+- `POLAR_PRODUCT_ID`
 - `POLAR_SUCCESS_URL`
 - `POLAR_SERVER` (`sandbox` or `production`)
 
 Notes:
 - `DATABASE_URL` must point to PostgreSQL.
 - Polar checkout/portal requires valid Polar credentials and product setup.
+- The Polar access token must belong to the same environment as `POLAR_SERVER`.
 - Sentry DSN values are currently initialized in Sentry config files.
 
 ## NPM Scripts
