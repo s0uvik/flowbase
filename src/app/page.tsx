@@ -1,15 +1,12 @@
-import { redirect } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import type { Metadata } from "next";
+import { LandingPage } from "@/features/landing-page/components/landing-page";
+
+export const metadata: Metadata = {
+  title: "Flowbase | Visual AI Workflow Builder",
+  description:
+    "Design AI-powered workflows visually, trigger them from webhooks, and run them reliably with execution tracking built in.",
+};
 
 export default function Page() {
-  redirect("/workflows");
-
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background">
-      <Loader2 className="w-8 h-8 animate-spin mb-4 text-primary" />
-      <p className="text-muted-foreground font-medium animate-pulse">
-        Redirecting to Workflows...
-      </p>
-    </div>
-  );
+  return <LandingPage />;
 }

@@ -1,4 +1,12 @@
-import { ReactFlowInstance } from "@xyflow/react";
-import { atom } from "jotai";
+import type { ReactFlowInstance } from "@xyflow/react";
+import { create } from "zustand";
 
-export const editorAtom = atom<ReactFlowInstance | null>(null);
+type EditorStore = {
+  editor: ReactFlowInstance | null;
+  setEditor: (editor: ReactFlowInstance | null) => void;
+};
+
+export const useEditorStore = create<EditorStore>((set) => ({
+  editor: null,
+  setEditor: (editor) => set({ editor }),
+}));

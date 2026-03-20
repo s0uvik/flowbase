@@ -53,7 +53,7 @@ export function LoginForm() {
       },
       {
         onSuccess: () => {
-          router.push("/");
+          router.push("/workflows");
         },
         onError: (error) => {
           toast.error(error.error.message);
@@ -68,7 +68,7 @@ export function LoginForm() {
       },
       {
         onSuccess: () => {
-          router.push("/");
+          router.push("/workflows");
         },
         onError: (error) => {
           toast.error(error.error.message);
@@ -82,11 +82,11 @@ export function LoginForm() {
       {
         email: data.email,
         password: data.password,
-        callbackURL: "/",
+        callbackURL: "/workflows",
       },
       {
         onSuccess: () => {
-          router.push("/");
+          router.push("/workflows");
         },
         onError: (error) => {
           toast.error(error.error.message);
@@ -103,9 +103,9 @@ export function LoginForm() {
         <CardHeader>
           <CardTitle className="text-2xl">
             Welcome back to{" "}
-            <span className=" text-primary font-semibold font-mono">
+            <Link href="/" className=" text-primary font-semibold font-mono">
               Flowbase
-            </span>
+            </Link>
           </CardTitle>
           <CardDescription>Enter your credentials to sign in</CardDescription>
         </CardHeader>

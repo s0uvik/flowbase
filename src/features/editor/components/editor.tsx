@@ -1,29 +1,28 @@
 "use client";
-import { ErrorView, LoadingView } from "@/components/entity-components";
-import { useSuspenseWorkflow } from "@/features/workflows/hooks/use-workflows";
-import { useState, useCallback, useMemo } from "react";
-import {
-  ReactFlow,
-  applyNodeChanges,
-  applyEdgeChanges,
-  addEdge,
-  type Node,
-  type Edge,
-  type NodeChange,
-  type EdgeChange,
-  type Connection,
-  Background,
-  Controls,
-  MiniMap,
-  Panel,
-} from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
-import { nodeComponents } from "@/features/nodes/config/node-components";
-import { AddNodeButton } from "@/components/add-node-button";
-import { useSetAtom } from "jotai";
-import { editorAtom } from "../store/atoms";
 import { NodeType } from "@prisma/client";
+import {
+  addEdge,
+  applyEdgeChanges,
+  applyNodeChanges,
+  Background,
+  type Connection,
+  Controls,
+  type Edge,
+  type EdgeChange,
+  MiniMap,
+  type Node,
+  type NodeChange,
+  Panel,
+  ReactFlow,
+} from "@xyflow/react";
+import { useCallback, useMemo, useState } from "react";
+import { AddNodeButton } from "@/components/add-node-button";
+import { ErrorView, LoadingView } from "@/components/entity-components";
 import { ExecuteWorkflowButton } from "@/components/execute-workflow-button";
+import { nodeComponents } from "@/features/nodes/config/node-components";
+import { useSuspenseWorkflow } from "@/features/workflows/hooks/use-workflows";
+import "@xyflow/react/dist/style.css";
+import { useEditorStore } from "../store/atoms";
 
 export const EditorLoading = () => {
   return <LoadingView message="Loading editor..." />;
@@ -36,7 +35,7 @@ export const EditorError = () => {
 export const Editor = ({ workflowId }: { workflowId: string }) => {
   const { data: workflow } = useSuspenseWorkflow(workflowId);
 
-  const setEditor = useSetAtom(editorAtom);
+  const setEditor = useEditorStore((state) => state.setEditor);
 
   const [nodes, setNodes] = useState<Node[]>(workflow.nodes);
   const [edges, setEdges] = useState<Edge[]>(workflow.edges);

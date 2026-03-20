@@ -65,10 +65,9 @@
     "html-entities": "^2.6.0",
     "inngest": "^3.52.0",
     "input-otp": "^1.4.2",
-    "jotai": "^2.18.0",
     "ky": "^1.14.3",
     "lucide-react": "^0.546.0",
-    "next": "15.5.4",
+    "next": "15.5.14",
     "next-themes": "^0.4.6",
     "nuqs": "^2.8.8",
     "random-word-slugs": "^0.1.7",
@@ -85,7 +84,8 @@
     "tailwind-merge": "^3.3.1",
     "toposort": "^2.0.2",
     "vaul": "^1.1.2",
-    "zod": "^4.1.12"
+    "zod": "^4.1.12",
+    "zustand": "^4.5.7"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.0",
