@@ -26,6 +26,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
+import { createAuthClient } from "better-auth/client";
 
 const loginFormSchema = z.object({
   email: z.string().min(1, "Email is required").email("Email is invalid"),
@@ -43,6 +44,39 @@ export function LoginForm() {
       password: "",
     },
   });
+
+  const authClient = createAuthClient();
+  const signInWithGithub = async () => {
+    await authClient.signIn.social(
+      {
+        provider: "github",
+      },
+      {
+        onSuccess: () => {
+          router.push("/");
+        },
+        onError: (error) => {
+          toast.error(error.error.message);
+        },
+      },
+    );
+  };
+  const signInWithGoogle = async () => {
+    await authClient.signIn.social(
+      {
+        provider: "google",
+      },
+      {
+        onSuccess: () => {
+          router.push("/");
+        },
+        onError: (error) => {
+          toast.error(error.error.message);
+        },
+      },
+    );
+  };
+
   const onSubmit = async (data: LoginFormValues) => {
     await authClient.signIn.email(
       {
@@ -85,6 +119,7 @@ export function LoginForm() {
                     className="w-full"
                     type="button"
                     disabled={isPending}
+                    onClick={signInWithGoogle}
                   >
                     <Image
                       src="/icons/google.svg"
@@ -100,6 +135,7 @@ export function LoginForm() {
                     className="w-full"
                     type="button"
                     disabled={isPending}
+                    onClick={signInWithGithub}
                   >
                     <Image
                       src="/icons/github.svg"

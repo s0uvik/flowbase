@@ -1,36 +1,15 @@
-"use client";
-import { Button } from "@/components/ui/button";
-import { requireAuth } from "@/lib/auth-utils";
-import { useTRPC } from "@/trpc/client";
-import { caller, trpc } from "@/trpc/server";
-import { useMutation } from "@tanstack/react-query";
-import React from "react";
-import { toast } from "sonner";
+import { redirect } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
-const page = () => {
-  // await requireAuth();
+export default function Page() {
+  redirect("/workflows");
 
-  const trpc = useTRPC();
-
-  // const data = await caller.getUsers();
-  const testAI = useMutation(
-    trpc.testAI.mutationOptions({
-      onSuccess: () => {
-        toast.success("Success");
-      },
-      onError: () => {
-        toast.error("Error");
-      },
-    }),
-  );
   return (
-    <div>
-      {/* {JSON.stringify(data)} */}
-      <Button disabled={testAI.isPending} onClick={() => testAI.mutate()}>
-        Test AI
-      </Button>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-background">
+      <Loader2 className="w-8 h-8 animate-spin mb-4 text-primary" />
+      <p className="text-muted-foreground font-medium animate-pulse">
+        Redirecting to Workflows...
+      </p>
     </div>
   );
-};
-
-export default page;
+}
