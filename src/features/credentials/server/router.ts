@@ -1,16 +1,14 @@
+import { CredentialType } from "@prisma/client";
+import { TRPCError } from "@trpc/server";
+import z from "zod";
 import { PAGINATION } from "@/config/constant";
 import prisma from "@/lib/db";
-import {
-  protectedProcedure,
-  createTRPCRouter,
-  premiumProcedure,
-} from "@/trpc/init";
-import z from "zod";
-import { CredentialType } from "@prisma/client";
 import { encrypt } from "@/lib/encryption";
+import { polarClient } from "@/lib/polar";
+import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 
 export const credentialsRouter = createTRPCRouter({
-  create: premiumProcedure
+  create: protectedProcedure
     .input(
       z.object({
         name: z.string().min(1, "Name is required"),
@@ -18,8 +16,29 @@ export const credentialsRouter = createTRPCRouter({
         value: z.string().min(1, "Value is required"),
       }),
     )
-    .mutation(({ ctx, input }) => {
+    .mutation(async ({ ctx, input }) => {
       const { name, value, type } = input;
+
+      const customer = await polarClient.customers.getStateExternal({
+        externalId: ctx.auth.user.id,
+      });
+      const hasActiveSubscription = !!customer.activeSubscriptions?.length;
+
+      if (!hasActiveSubscription) {
+        const credentialCount = await prisma.credential.count({
+          where: {
+            userId: ctx.auth.user.id,
+          },
+        });
+
+        if (credentialCount >= 1) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You need a premium subscription to access this feature",
+          });
+        }
+      }
+
       return prisma.credential.create({
         data: {
           name,
